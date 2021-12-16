@@ -4,16 +4,17 @@
 int main ( int argc, char ** argv)
 {
   int N = (argc < 2) ? 1000 : atoi(argv[1]);
-  int size_n = N*N*sizeof(double);
+  int NN = N*N;
+  int size_n = NN*sizeof(double);
   double *h_a, *h_b, *h_c;
   double *d_a, *d_b, *d_c;
 
-  h_a = (double *) malloc ( N * N * sizeof(double));
-  h_b = (double *) malloc ( N * N * sizeof(double));
-  h_c = (double *) malloc ( N * N * sizeof(double));
+  h_a = (double *) malloc ( size_n);
+  h_b = (double *) malloc ( size_n);
+  h_c = (double *) malloc ( size_n);
 
   // Init values
-  for ( int i = 0; i < (N*N); i++)
+  for ( int i = 0; i < NN; i++)
     {
       h_a[i] = 1;
       h_b[i] = 1;
