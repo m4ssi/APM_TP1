@@ -6,7 +6,7 @@ int main ( int argc, char ** argv)
   int N = (argc < 2) ? 1000 : atoi(argv[1]);
   int size_n = N*N*sizeof(double);
   double *h_a, *h_b, *h_c;
-  double *d_a, *d_b, *h_c;
+  double *d_a, *d_b, *d_c;
 
   h_a = (double *) malloc ( N * N * sizeof(double));
   h_b = (double *) malloc ( N * N * sizeof(double));
