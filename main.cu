@@ -3,11 +3,17 @@
 
 __global__ void kernel ( double * a, double * b, double * c, int N)
 {
-  int i = blockIdx.x * blockDim.x + threadIdx.x;
-  if ( i < N)
-    {
-      c[i] = a[i] + b[i];
-    }
+  int g_block_i = blockIdx.y * gridDim.x + blockIdx.x;
+  int n_threads = blockDim.x * blockDim.y;
+  int g_thread_i = g_block_i * n_threads + (threadIdx.y * blockDim.x + threadIdx.x);
+  int g_mat_i = g_thread_i / N;
+  int g_mat_j = g_thread_i % N;
+    
+  
+  //~ if ( g_mat_i < N)
+    //~ {
+      c[g_mat_i * N + g_mat_j] = g_thread_i;
+    //~ }
 }
 
 int main ( int argc, char ** argv)
@@ -44,6 +50,12 @@ int main ( int argc, char ** argv)
   kernel<<<dimGrid, dimBlock>>>(d_a, d_b, d_c, N);
 
   cudaMemcpy ( h_c, d_c, size_n, cudaMemcpyDeviceToHost);
+
+
+
+	for	( int i = 0; i < NN; i++)
+		printf ("%lf ", h_c[i]);
+	printf ("\n");
 
   // Free on device
   cudaFree(d_a);
