@@ -1,11 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+__global__ void kernel ( double * a, double * b, double * c, int N)
+{
+  int i = blockIdx.x * blockDim.x + threadIdx.x;
+  if ( i < N)
+    {
+      c[i] = a[i] + b[i];
+    }
+}
+
 int main ( int argc, char ** argv)
 {
   int N = (argc < 2) ? 1000 : atoi(argv[1]);
   int NN = N*N;
-  int size_n = NN*sizeof(double);
+  int size_n = N*sizeof(double);
   double *h_a, *h_b, *h_c;
   double *d_a, *d_b, *d_c;
 
@@ -14,7 +23,7 @@ int main ( int argc, char ** argv)
   h_c = (double *) malloc ( size_n);
 
   // Init values
-  for ( int i = 0; i < NN; i++)
+  for ( int i = 0; i < N; i++)
     {
       h_a[i] = 1;
       h_b[i] = 1;
@@ -26,6 +35,15 @@ int main ( int argc, char ** argv)
   cudaMalloc ((void **) &d_b, size_n);
   cudaMalloc ((void **) &d_c, size_n);
 
+  cudaMemcpy ( d_a, h_a, size_n, cudaMemcpyHostToDevice);
+  cudaMemcpy ( d_b, h_b, size_n, cudaMemcpyHostToDevice);
+
+  dim3 dimBlock ( 64, 1, 1);
+  dim3 dimGrid ( (N+ dimBlock.x -1)/dimBlock.x, 1, 1);
+
+  kernel<<<dimGrid, dimBlock>>>(d_a, d_b, d_c, N);
+
+  cudaMemcpy ( h_c, d_c, size_n, cudaMemcpyDeviceToHost);
 
   // Free on device
   cudaFree(d_a);
