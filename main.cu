@@ -8,19 +8,20 @@ __global__ void kernel ( double * a, double * b, double * c, int N)
   int g_thread_i = g_block_i * n_threads + (threadIdx.y * blockDim.x + threadIdx.x);
   int g_mat_i = g_thread_i / N;
   int g_mat_j = g_thread_i % N;
-    
-  
-  //~ if ( g_mat_i < N)
-    //~ {
-      c[g_mat_i * N + g_mat_j] = g_thread_i;
-    //~ }
+  for ( int i = 0; i < N; i++)
+  {
+//	for ( int j = 0; j < N; j++)
+//	   {
+		c[g_mat_i * N + g_mat_j] = a[g_mat_i * N + i] * b[ i * N + g_mat_j];
+//	   }
+  }
 }
 
 int main ( int argc, char ** argv)
 {
-  int N = (argc < 2) ? 1000 : atoi(argv[1]);
+  int N = (argc < 2) ? 64 : atoi(argv[1]);
   int NN = N*N;
-  int size_n = N*sizeof(double);
+  int size_n = NN*sizeof(double);
   double *h_a, *h_b, *h_c;
   double *d_a, *d_b, *d_c;
 
@@ -44,8 +45,8 @@ int main ( int argc, char ** argv)
   cudaMemcpy ( d_a, h_a, size_n, cudaMemcpyHostToDevice);
   cudaMemcpy ( d_b, h_b, size_n, cudaMemcpyHostToDevice);
 
-  dim3 dimBlock ( 64, 1, 1);
-  dim3 dimGrid ( (N+ dimBlock.x -1)/dimBlock.x, 1, 1);
+  dim3 dimBlock ( 32, 32);
+  dim3 dimGrid ( N/dimBlock.x, N/dimBlock.y);
 
   kernel<<<dimGrid, dimBlock>>>(d_a, d_b, d_c, N);
 
