@@ -1,0 +1,18 @@
+* APM : TP1
+
+Architecture et Programmation d'accélérateurs Matériels
+
+** Work done
+
+We propose here an implementation of a matrix multiplication CUDA kernel.
+We compute : 
+
+$$C = AB$$
+
+Where : 
+
+- $$A_{i,j} = 1 $$
+- $$B_{i,j} = 1 $$
+- $A, B and C$ are square matrix of order N
+
+The result is necessarly $C_{i,j} = N$
